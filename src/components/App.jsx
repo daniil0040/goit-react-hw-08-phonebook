@@ -43,7 +43,7 @@ export class App extends Component {
         <h1>Phonebook</h1>
         <AddContactForm onAddContact={this.hendleAddContact} contacts={this.state.contacts}/>
         <h2>Contacts</h2>
-        <ContactListFilter onFilter={ this.hendleFilter} />
+        <ContactListFilter onFilter={this.hendleFilter} filter={this.state.filter} />
         <ContactList contacts={visibleContacts} onDelete={ this.hendleDeleteItem} />
     </div>
   ); 

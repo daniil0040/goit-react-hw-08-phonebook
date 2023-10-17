@@ -1,5 +1,5 @@
-export const ContactListFilter = ({onFilter}) => {
+export const ContactListFilter = ({onFilter, filter}) => {
     return <div>
-        <input type="text" onChange={(e)=>{onFilter(e.target.value)}} placeholder="🔎"/>
+        <input value={filter} type="text" onChange={(e)=>{onFilter(e.target.value)}} placeholder="🔎"/>
     </div>
 }
