@@ -3,11 +3,13 @@ import {Form,ErrorMessage } from 'formik';
 
 export const FormContainer = styled.div`
 border: 1px solid #008B8B;
+border-radius: 5px;
 width: 250px;
 display: flex;
 justify-content: center;
 padding-bottom: 10px;
 margin-bottom: 10px;
+margin-top: 10px;
 `
 
 export const AddForm = styled(Form)`
