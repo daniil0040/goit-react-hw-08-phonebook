@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useEffect, useState } from "react";
 import { AddContactForm } from "./AddContactForm/AddContactForm";
 import { ContactList } from "./ContactList/ContactList";
 import { nanoid } from 'nanoid'
@@ -6,65 +6,45 @@ import { ContactListFilter } from "./ContactListFilter/ContactListFilter";
 import { DefaultMsg } from "./DefaultMsg/DefaultMsg";
 import { Layout } from "./Layout";
 
-
-export class App extends Component {
-  state = {
-  contacts: [],
-  filter: ''
-  }
-
-  componentDidMount() {
+const getInitialContacts = () => {
     const savedContacts = localStorage.getItem("savedContacts")
     if (savedContacts !== null) {
-      this.setState({
-        contacts: JSON.parse(savedContacts)
-      })
+      return JSON.parse(savedContacts)
     }
+    return []
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-        localStorage.setItem("savedContacts",JSON.stringify(this.state.contacts))
-    }
-}
+export const App = () => {
+  const [contacts, setContacts] = useState(getInitialContacts);
+  const [filter, setFilter] = useState('');
+  
+  useEffect(() => {
+  localStorage.setItem("savedContacts",JSON.stringify(contacts))
+},[contacts])
 
-  hendleDeleteItem = contactId => {
-    const updatedContacts = this.state.contacts.filter(({ id }) => id !== contactId)
-    this.setState(() => ({
-      contacts: updatedContacts,
-    }))
+  const hendleDeleteItem = contactId => {
+    const updatedContacts = contacts.filter(({ id }) => id !== contactId)
+    setContacts(updatedContacts)
   }
 
-  hendleAddContact = newContact => {
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts,{...newContact,id: nanoid()}]
-    }) )
+  const hendleAddContact = newContact => {
+    setContacts(prevState=> [...prevState,{...newContact,id: nanoid()}])
   }
 
-  hendleFilter = newFilter => {
-    this.setState(() => ({
-      filter: `${newFilter.toLowerCase().trim()}`
-    }))
+  const hendleFilter = newFilter => {
+  setFilter(`${newFilter.toLowerCase().trim()}`)
   }
 
-  getVisibleContacts = () => {
-    return this.state.contacts.filter((contact) => {
-      return contact.name.toLowerCase().includes(this.state.filter)
+  const visibleContacts = contacts.filter((contact) => {
+      return contact.name.toLowerCase().includes(filter)
     })
-  }
 
-  render() {
-    const visibleContacts = this.getVisibleContacts()
-    return (
+  return (
       <Layout>
         <h1>Phonebook</h1>
-        <AddContactForm onAddContact={this.hendleAddContact} contacts={this.state.contacts}/>
+        <AddContactForm onAddContact={hendleAddContact} contacts={contacts}/>
         <h2>Contacts</h2>
-        {this.state.contacts.length === 0 ? <DefaultMsg/> : <> <ContactListFilter onFilter={this.hendleFilter} filter={this.state.filter} /> <ContactList contacts={visibleContacts} onDelete={ this.hendleDeleteItem} /> </>}
-        {/* <DefaultMsg/>
-        <ContactListFilter onFilter={this.hendleFilter} filter={this.state.filter} />
-        <ContactList contacts={visibleContacts} onDelete={ this.hendleDeleteItem} /> */}
+        {contacts.length === 0 ? <DefaultMsg/> : <> <ContactListFilter onFilter={hendleFilter} filter={filter} /> <ContactList contacts={visibleContacts} onDelete={hendleDeleteItem} /> </>}
     </Layout>
   ); 
-  }
-};
+}
