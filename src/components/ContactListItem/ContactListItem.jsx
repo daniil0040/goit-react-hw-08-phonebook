@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Contact } from './ContactListItem.styled';
+import { Contact, PhoneLink } from './ContactListItem.styled';
 import { getVisibleContacts } from 'redux/contacts/contactsSlice';
 import { deleteContact } from 'redux/contacts/contactsOperations';
 
@@ -11,7 +11,7 @@ export const ContactListItem = () => {
     return (
       <Contact key={id}>
         <p>{name}</p>
-        <p>{number}</p>
+        <PhoneLink href={'tel:' + number}>{number}</PhoneLink>
         <button type="button" onClick={() => dispatch(deleteContact(id))}>
           Delete
         </button>
