@@ -1,52 +1,55 @@
-import { useEffect } from 'react';
-import { AddContactForm } from './AddContactForm/AddContactForm';
-import { ContactList } from './ContactList/ContactList';
-import { ContactListFilter } from './ContactListFilter/ContactListFilter';
-import { DefaultMsg } from './DefaultMsg/DefaultMsg';
+import { Route, Routes } from 'react-router-dom';
+import { RestrictedRoute } from './RestrictedRoute';
+import { PrivateRoute } from './PrivateRoute';
+import { useAuth } from 'hooks';
+import { useDispatch } from 'react-redux';
+import { refreshUser } from 'redux/auth/authOperations';
+import { lazy, useEffect } from 'react';
 import { Layout } from './Layout';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllContacts } from 'redux/operations';
-import { selectContacts, selectErr, selectLoading } from 'redux/contactsSlice';
 
-// const getInitialContacts = () => {
-//   const savedContacts = localStorage.getItem('savedContacts');
-//   if (savedContacts !== null) {
-//     return JSON.parse(savedContacts);
-//   }
-//   return [];
-// };
+const Home = lazy(() => import('pages/Home'));
+const Register = lazy(() => import('pages/Register'));
+const Login = lazy(() => import('pages/Login'));
+const PhoneBook = lazy(() => import('pages/PhoneBook'));
 
 export const App = () => {
-  const contacts = useSelector(selectContacts);
-  const loading = useSelector(selectLoading);
-  const error = useSelector(selectErr);
   const dispatch = useDispatch();
+  const { isRefreshing } = useAuth();
 
-  // useEffect(() => {
-  //   localStorage.setItem('savedContacts', JSON.stringify(contacts));
-  // }, [contacts]);
   useEffect(() => {
-    dispatch(getAllContacts());
+    dispatch(refreshUser());
   }, [dispatch]);
 
-  return (
-    <Layout>
-      <h1>Phonebook</h1>
-      <AddContactForm />
-      <h2>Contacts</h2>
-
-      {error ? (
-        <div>Something went wrong...Try reload page!</div>
-      ) : loading ? (
-        <div>Loading...</div>
-      ) : contacts.length === 0 ? (
-        <DefaultMsg />
-      ) : (
-        <>
-          <ContactListFilter />
-          <ContactList />
-        </>
-      )}
-    </Layout>
+  return isRefreshing ? (
+    <b>Refreshing user...</b>
+  ) : (
+    <>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/phoneBook"
+            element={
+              <PrivateRoute redirectTo="/login" component={<PhoneBook />} />
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RestrictedRoute redirectTo="/phoneBook" component={<Login />} />
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RestrictedRoute
+                redirectTo="/phoneBook"
+                component={<Register />}
+              />
+            }
+          />
+        </Route>
+      </Routes>
+    </>
   );
 };

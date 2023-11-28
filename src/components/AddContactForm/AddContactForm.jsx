@@ -8,15 +8,15 @@ import {
   FormLable,
 } from './AddContactForm.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts } from 'redux/contactsSlice';
-import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/contacts/contactsSlice';
+import { addContact } from 'redux/contacts/contactsOperations';
 
 const phoneRegExp =
   /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const ContactSchema = Yup.object().shape({
   name: Yup.string().min(2, 'Too short!').required('This field is required!'),
-  phone: Yup.string()
+  number: Yup.string()
     .required('This field is required!')
     .matches(phoneRegExp, 'Phone number is not valid')
     .min(10, 'Too short!')
@@ -30,7 +30,7 @@ export const AddContactForm = () => {
       <Formik
         initialValues={{
           name: '',
-          phone: '',
+          number: '',
         }}
         validationSchema={ContactSchema}
         onSubmit={(values, actions) => {
@@ -39,10 +39,10 @@ export const AddContactForm = () => {
               `${values.name} is already in contacts.`
             );
           } else if (
-            contacts.map(({ phone }) => phone).includes(values.phone)
+            contacts.map(({ number }) => number).includes(values.number)
           ) {
             return Notiflix.Notify.failure(
-              `This number ${values.phone} is already in contacts.`
+              `This number ${values.number} is already in contacts.`
             );
           }
           dispatch(addContact(values));
@@ -57,8 +57,8 @@ export const AddContactForm = () => {
           </FormLable>
           <FormLable>
             <p>Number</p>
-            <Field name="phone" type="tel" />
-            <ErrMsg name="phone" component="span" />
+            <Field name="number" type="tel" />
+            <ErrMsg name="number" component="span" />
           </FormLable>
           <button type="submit">Add contact</button>
         </AddForm>
